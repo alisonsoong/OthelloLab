@@ -1,4 +1,5 @@
 class Board:
+
     def __init__(self, copy = None):
         '''when copying the board, input the another Board object as the copy parameter'''
 
@@ -56,11 +57,5 @@ class Board:
     
         return newBoard
 
-
-        
-        
-        
-
-    
 
         
