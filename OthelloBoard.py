@@ -32,10 +32,9 @@ class Board:
         return self.board[x][y]
 
     def setValue(self, x, y, color):
-        '''the color parameter should be either "b" or "w"'''
+        '''the color parameter should be a boolean'''
         
-        if color == 'w': self.board[x][y] = True
-        if color == 'b': self.board[x][y] = False
+        self.board[x][y] = color
 
     def toggle(self, x, y):
         '''swaps the board. only to be used if the square has already been set'''
