@@ -1,5 +1,7 @@
 # Alison
 
+from ctypes.wintypes import RGB
+from turtle import color
 from OthelloBoard import Board
 from graphics import *
 from Button import Button
@@ -12,13 +14,10 @@ class OthelloGUI:
         self.win.setBackground("white")
         self.win.setCoords(-15,-17,150+2,150*3/4)
 
-        # butotns
-        self.quitButton = Button(Point(115,7), 50, 8, "Quit")
-        self.quitButton.activate()
-        self.quitButton.draw(self.win)
-        self.replayButton = Button(Point(115,-5), 50, 8, "Reset")
-        self.replayButton.activate()
-        self.replayButton.draw(self.win)
+        # Set up gui
+        self.SetUpButtons()
+        self.SetUpScoreboard()
+        self.SetUpBoard()
 
         # title
         title = Text(Point(115, 90), "Othello") 
@@ -30,24 +29,6 @@ class OthelloGUI:
         self.startPrompt.setSize(13)
         self.whiteButton = Button(Point(101,25), 22, 8, "White")
         self.blackButton = Button(Point(129,25), 22, 8, "Black")
-
-        self.scoreLabel = Text(Point(115, 75), "Score") 
-        self.scoreLabel.setSize(25)
-        self.scoreLabel.draw(self.win)
-        Text(Point(101, 70), "White").draw(self.win)
-        Text(Point(129, 70), "Black").draw(self.win)
-        self.whiteScoreLabel = Text(Point(101, 75), "2") 
-        self.whiteScoreLabel.setSize(20)
-        self.whiteScoreLabel.draw(self.win)
-        self.blackScoreLabel = Text(Point(129, 75), "2")
-        self.blackScoreLabel.setSize(20) 
-        self.blackScoreLabel.draw(self.win)
-
-        # draw the text
-        for i in range(8):
-            Text(Point(10*i, 97.5), chr(i+ord('a'))).draw(self.win)
-        for i in range(8):
-            Text(Point(77.5, 10*i+20), i+1).draw(self.win)
 
         self.gameStart = True
         self.prevGameStart = False # state
@@ -64,14 +45,55 @@ class OthelloGUI:
                 row.append(Circle(Point(x*10,y*10+10), 3.8))
             self.pieces.append(row)
 
-        for i in range(8):
-            for j in range(8):
+        self.pieces[3][3].setFill(color_rgb(0,0,0))
+        self.pieces[3][4].setFill(color_rgb(255,255,255))
+        self.pieces[4][4].setFill(color_rgb(0,0,0))
+        self.pieces[4][3].setFill(color_rgb(255,255,255))
+        for i in range(3,5):
+            for j in range(3,5):
                 self.pieces[i][j].draw(self.win)
+
+        self.win.update()
+
+    def SetUpButtons(self):
+        self.quitButton = Button(Point(115,7), 50, 8, "Quit")
+        self.quitButton.activate()
+        self.quitButton.draw(self.win)
+        self.replayButton = Button(Point(115,-5), 50, 8, "Reset")
+        self.replayButton.activate()
+        self.replayButton.draw(self.win)
+
+    def SetUpScoreboard(self):
+        self.scoreLabel = Text(Point(115, 75), "Score") 
+        self.scoreLabel.setSize(25)
+        self.scoreLabel.draw(self.win)
+        Text(Point(101, 70), "White").draw(self.win)
+        Text(Point(129, 70), "Black").draw(self.win)
+        self.whiteScoreLabel = Text(Point(101, 75), "2") 
+        self.whiteScoreLabel.setSize(20)
+        self.whiteScoreLabel.draw(self.win)
+        self.blackScoreLabel = Text(Point(129, 75), "2")
+        self.blackScoreLabel.setSize(20) 
+        self.blackScoreLabel.draw(self.win)
 
         self.whiteScore = 2
         self.blackScore = 2
 
-        self.win.update()
+    def SetUpBoard(self):
+        # draw grid
+        for y in range(8):
+            for x in range(8):
+                rec = Rectangle(Point(x*10-5,y*10+10+5), Point(x*10+10-5,y*10+10+10+5))
+                rec.setFill(color_rgb(98, 150, 100))
+                rec.setOutline(color_rgb(255, 255, 255))
+                rec.draw(self.win)
+
+        # draw the text
+        for i in range(8):
+            Text(Point(10*i, 97.5), chr(i+ord('a'))).draw(self.win)
+        for i in range(8):
+            Text(Point(77.5, 10*i+20), i+1).draw(self.win)
+
 
     def Update(self):
 
@@ -99,6 +121,11 @@ class OthelloGUI:
             self.RemoveConfigForStart()
             return
         
+        curX = pt.getX() + 5
+        curY = pt.getY() - 15
+        curPos = (int(curX/10), int(curY/10)) # current tile clicked
+        print(curPos)
+
         if self.gameStart: return
         # otherwise, if done with getting user color at start...
 
