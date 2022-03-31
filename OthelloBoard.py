@@ -1,7 +1,7 @@
 class Board:
 
     def __init__(self, copy = None):
-        '''when copying the board, input the another Board object as the copy parameter'''
+        '''when copying the board, input the desired Board object as the copy parameter'''
 
         if copy != None:
             self.board = copy.copyBoard()
