@@ -29,6 +29,11 @@ class Board:
             for y in range(8):
                 self.board[x][y] = None
 
+        self.board[3][3] = False
+        self.board[4][4] = False
+        self.board[3][4] = True
+        self.board[4][3] = True
+
     def getValue(self, x, y):
         return self.board[x][y]
 
