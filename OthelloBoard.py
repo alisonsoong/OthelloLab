@@ -63,4 +63,10 @@ class Board:
         return newBoard
 
 
+#board add a update = the freshly placed piece is passed, and any unresolved board
+#is found and resolved
+#calculate score function
+
+
+
         
