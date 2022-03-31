@@ -193,9 +193,6 @@ class OthelloGUI:
             self.RemoveConfigForStart()
             return
         
-        
-        
-
 
 
 
