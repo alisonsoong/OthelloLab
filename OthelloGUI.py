@@ -5,6 +5,7 @@ from turtle import color
 from OthelloBoard import Board
 from graphics import *
 from Button import Button
+from OthelloPiece import Piece
 
 class OthelloGUI:
     def __init__(self):
@@ -13,6 +14,14 @@ class OthelloGUI:
         self.win = GraphWin("Othello", 800, 600, autoflush = False)
         self.win.setBackground("white")
         self.win.setCoords(-15,-17,150+2,150*3/4)
+
+        self.pieces = []
+        for yy in range(8):
+            row = []
+            y = 8-yy
+            for x in range(8):
+                row.append(Piece(x,y,True))
+            self.pieces.append(row)
 
         # Set up gui
         self.SetUpButtons()
@@ -37,21 +46,7 @@ class OthelloGUI:
         self.userColor = True # color that user chooses at thte start of the game
         self.isDone = False
 
-        self.pieces = []
-        for yy in range(8):
-            row = []
-            y = 8-yy
-            for x in range(8):
-                row.append(Circle(Point(x*10,y*10+10), 3.8))
-            self.pieces.append(row)
-
-        self.pieces[3][3].setFill(color_rgb(0,0,0))
-        self.pieces[3][4].setFill(color_rgb(255,255,255))
-        self.pieces[4][4].setFill(color_rgb(0,0,0))
-        self.pieces[4][3].setFill(color_rgb(255,255,255))
-        for i in range(3,5):
-            for j in range(3,5):
-                self.pieces[i][j].draw(self.win)
+        self.curPlayer = False
 
         self.win.update()
 
@@ -94,6 +89,13 @@ class OthelloGUI:
         for i in range(8):
             Text(Point(77.5, 10*i+20), i+1).draw(self.win)
 
+        self.pieces[3][3].toggleToColor(True)
+        self.pieces[3][4].toggleToColor(False)
+        self.pieces[4][4].toggleToColor(True)
+        self.pieces[4][3].toggleToColor(False)
+        for i in range(3,5):
+            for j in range(3,5):
+                self.pieces[i][j].draw(self.win)
 
     def Update(self):
 
@@ -124,10 +126,21 @@ class OthelloGUI:
         curX = pt.getX() + 5
         curY = pt.getY() - 15
         curPos = (int(curX/10), int(curY/10)) # current tile clicked
-        print(curPos)
 
         if self.gameStart: return
         # otherwise, if done with getting user color at start...
+
+        print("AH DONE")
+        if self.curPlayer == self.userColor and self.WithinBoard(curPos):
+            print("You move")
+            self.curPlayer = not self.userColor
+
+        if (self.curPlayer != self.userColor):
+            print("AI moves")
+            self.curPlayer = self.userColor
+
+    def WithinBoard(self, pos):
+        return 0 <= pos[0] <= 7 and 0 <= pos[1] <= 7
 
     def IsDone(self):
         return self.isDone
@@ -140,6 +153,14 @@ class OthelloGUI:
         for i in range(8):
             for j in range(8):
                 self.pieces[i][j].undraw()
+
+        self.pieces[3][3].toggleToColor(True)
+        self.pieces[3][4].toggleToColor(False)
+        self.pieces[4][4].toggleToColor(True)
+        self.pieces[4][3].toggleToColor(False)
+        for i in range(3,5):
+            for j in range(3,5):
+                self.pieces[i][j].draw(self.win)
 
         self.whiteScore = 2
         self.blackScore = 2
