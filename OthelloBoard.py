@@ -2,7 +2,7 @@ class Board:
 
     def __init__(self, copy = None):
         '''when copying the board, input the desired Board object as the copy parameter'''
-
+        
         if copy != None:
             self.board = copy.copyBoard()
 
@@ -29,10 +29,10 @@ class Board:
             for y in range(8):
                 self.board[x][y] = None
 
-        self.board[3][3] = False
-        self.board[4][4] = False
-        self.board[3][4] = True
-        self.board[4][3] = True
+        self.board[3][3] = True
+        self.board[4][4] = True
+        self.board[3][4] = False
+        self.board[4][3] = False
 
     def getValue(self, x, y):
         return self.board[x][y]

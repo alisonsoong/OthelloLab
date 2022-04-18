@@ -32,6 +32,11 @@ class Button:
                 self.rect.draw(win) 
                 self.label.draw(win)
 
+        def setOutlineFillText(self, outline, fill, text):
+                self.rect.setOutline(outline)
+                self.rect.setFill(fill)
+                self.label.setTextColor(text)
+
         def clicked(self, pt):
                 """Returns true if the point is inside of the button false if not"""
                 return (self.active and self.xmin <= pt.getX() <= self.xmax
@@ -52,13 +57,13 @@ class Button:
 
         def activate(self):
                 "Sets this button to 'active'. Makes button clickable"
-                self.label.setFill('black')
+                # self.label.setFill('black')
                 self.rect.setWidth(2)
                 self.active = True
 
         def deactivate(self):
                 "Sets this button to 'inactive'"
-                self.label.setFill("darkgrey")
+                # self.label.setFill("darkgrey")
                 self.rect.setWidth(1)
                 self.active = False
 
