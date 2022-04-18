@@ -118,7 +118,7 @@ class OthelloGUI:
 
     def updateBoard(self):
         # print("updated board")
-        diff = self.prevBoard-self.curBoard
+        diff = self.curBoard-self.prevBoard
         # print(diff)
         for change in diff:
             x,y = change[0], change[1]
