@@ -70,7 +70,15 @@ class OthelloGUI:
         self.prompt.setText(self.wrapPrompt(text))
 
     def wrapPrompt(self, text):
-        return text
+        adjusted = ""
+        index = 0
+        for i in range(1,len(text)//130+1):
+            adjusted += text[index:130*i]
+            if (text[i*130] == " " or text[i*130-1] == " "): adjusted += "\n"
+            else: adjusted += "-\n"
+            index = i*130
+        adjusted += text[index:]
+        return adjusted
 
     def setUpButtons(self):
         self.quitButton = Button(Point(115,30), 50, 8, "Quit")
