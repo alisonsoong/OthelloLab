@@ -171,8 +171,10 @@ class OthelloGUI:
                 self.pt = self.win.getMouse()
             self.getUserColor(self.pt)
         else:
-            # if not self.turnSkip_:
-            self.pt = self.win.getMouse()
+            if not self.turnSkip_:
+                self.pt = self.win.getMouse()
+            else:
+                time.sleep(1.5)
         
         self.win.update()
 
@@ -212,7 +214,8 @@ class OthelloGUI:
         self.prevBoard = Board(self.curBoard) # make a copy of the previous board
 
         # print(self.userColor_, self.curPlayerColor_)
-        
+        self.getUserMoves()
+
         if self.userColor_ and not self.curPlayerColor_ or self.turnSkip_: # if user color is white, let AI move if cur player is black
             print("first move lol")
             self.makeAIMove()
