@@ -101,15 +101,28 @@ class Board:
                 if validMove:
                     possMoves.append((newCoord[0], newCoord[1]))
         return possMoves
+
+    def calcScore(self):
+        '''returns white score then black score'''
+        #checks each of the 64 spaces in the board object and tallies the number of each piece
+        white = 0
+        black = 0
+        for x in range(8):
+            for y in range(8):
+                if self.board[x][y] == True:
+                    white += 1
+                if self.board[x][y] == False:
+                    black += 1
+        return white, black
                                         
 def test():
     test = Board()
-    #test.setValue(3,3, False)
-    #test.setValue(3,4, True)
-    #test.setValue(4,3, True)
-    #test.setValue(4,4, False)
+    test.setValue(3,3, False)
+    test.setValue(3,4, True)
+    test.setValue(4,3, True)
+    test.setValue(4,4, False)
 
-    test.setValue(2,6, True)
+    '''test.setValue(2,6, True)
     test.setValue(2,5, True)
     test.setValue(2,4, True)
     test.setValue(4,4, True)
@@ -117,12 +130,17 @@ def test():
     test.setValue(3,2, False)
     test.setValue(3,3, False)
     test.setValue(3,4, False)
-    test.setValue(4,3, False)
+    test.setValue(4,3, False)'''
 
     
 
     possMoves = test.simMoves(False)
     print(possMoves)
+
+    w, b = test.calcScore()
+    print(w, b)
+    
+    
 
     
         
