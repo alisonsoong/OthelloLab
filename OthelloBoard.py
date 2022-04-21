@@ -62,6 +62,71 @@ class Board:
     
         return newBoard
 
+    def simMoves(self, color):
+        '''returns a list of possible moves based on the color parameter.
+        Colors passed as booleans, white is True, black is False.'''
+        
+        possMoves = []
+
+        existingPieces = []
+        
+        for x in range(8):
+            for y in range(8):
+                if self.board[x][y] == color:
+                    existingPieces.append([x,y])
+
+        print(existingPieces)
+
+        #checking 8 directions
+        directions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
+        for coord in existingPieces:
+            #for each piece, the board spaces in the 8 directions are checked iteratively
+            #if the move is legal, then it is added to possMoves
+            
+            for direction in directions:
+                newCoord = [coord[0], coord[1]]
+                validMove = False
+                while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                    newCoord[1] += direction[1]
+                    newCoord[0] += direction[0]
+                    temp = self.board[newCoord[0]][newCoord[1]]
+                    if temp != None and temp == (not color):
+                        validMove = True
+                    elif temp == color:
+                        validMove = False
+                        break
+                    else:
+                        break
+
+                if validMove:
+                    possMoves.append((newCoord[0], newCoord[1]))
+        return possMoves
+                                        
+def test():
+    test = Board()
+    #test.setValue(3,3, False)
+    #test.setValue(3,4, True)
+    #test.setValue(4,3, True)
+    #test.setValue(4,4, False)
+
+    test.setValue(2,6, True)
+    test.setValue(2,5, True)
+    test.setValue(2,4, True)
+    test.setValue(4,4, True)
+
+    test.setValue(3,2, False)
+    test.setValue(3,3, False)
+    test.setValue(3,4, False)
+    test.setValue(4,3, False)
+
+    
+
+    possMoves = test.simMoves(False)
+    print(possMoves)
+
+    
+        
+
 
 #board add a update = the freshly placed piece is passed, and any unresolved board
 #is found and resolved

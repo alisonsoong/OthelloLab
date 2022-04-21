@@ -18,7 +18,7 @@ class OthelloAI:
 
         #checking 8 directions
                     
-        possMoves= []
+        possMoves = []
         for coord in existingPieces:
             validMove = False
             #up

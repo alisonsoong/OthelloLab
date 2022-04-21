@@ -274,9 +274,9 @@ class OthelloGUI:
             self.userColor_ = False
             self.removeConfigForStart()
             return
+
         
-        
-        
+    
 
 
 
