@@ -114,7 +114,41 @@ class Board:
                 if self.board[x][y] == False:
                     black += 1
         return white, black
-                                        
+
+    def placePiece(self, coord, color):
+        '''uses methods from Othello Piece class to place a piece and update the board.
+        coord should be a tuple pair'''
+
+        self.board[coord[0]][coord[1]] = color
+        directions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
+        for direction in directions:
+            newCoord = [coord[0], coord[1]]
+            swap = False
+            while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                newCoord[1] += direction[1]
+                newCoord[0] += direction[0]
+                temp = self.board[newCoord[0]][newCoord[1]]
+                if temp != None and temp == (not color):
+                    swap = True
+                elif temp == None:
+                    swap = False
+                    break
+                else:
+                    break
+
+            if swap:
+                newCoord2 = [coord[0], coord[1]]
+                while 0 < newCoord2[0] < 7 and 0 < newCoord2[1] < 7:
+                    newCoord2[0] += direction[0]
+                    newCoord2[1] += direction[1]
+
+                    temp = self.board[newCoord2[0]][newCoord2[1]]
+                    
+                    if temp == (not color):
+                        self.board[newCoord2[0]][newCoord2[1]] = color
+                    else:
+                        break    
+                             
 def test():
     test = Board()
     test.setValue(3,3, False)
@@ -139,16 +173,14 @@ def test():
 
     w, b = test.calcScore()
     print(w, b)
-    
-    
 
-    
-        
+    a = input()
 
+    test.placePiece((2,4), False)
 
-#board add a update = the freshly placed piece is passed, and any unresolved board
-#is found and resolved
-#calculate score function
+    w, b = test.calcScore()
+    print(w, b)
+    print(test.board)
 
 
 
