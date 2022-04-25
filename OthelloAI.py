@@ -18,24 +18,29 @@ class OthelloAI:
 
         #checking 8 directions
                     
-        possMoves= []
+        directions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
         for coord in existingPieces:
-            validMove = False
-            #up
-            newCoord = coord
-            while newCoord[1] < 7:
-                newCoord[1] += 1
-                temp = board[newCoord[0]][newCoord[1]]
-                if temp != None and temp == not self.color:
-                    validMove = True
-                elif temp == self.color:
-                    validMove = False
-                    break
-                else:
-                    break
+            #for each piece, the board spaces in the 8 directions are checked iteratively
+            #if the move is legal, then it is added to possMoves
+            for direction in directions:
+                newCoord = [coord[0], coord[1]]
+                validMove = False
+                while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                    newCoord[1] += direction[1]
+                    newCoord[0] += direction[0]
+                    temp = board[newCoord[0]][newCoord[1]]
+                    if temp != None and temp == (not self.color):
+                        validMove = True
+                    elif temp == self.color:
+                        validMove = False
+                        break
+                    else:
+                        break
 
-            if validMove:
-                possMoves.append(newCoord)
+                if validMove:
+                    possMoves.append((newCoord[0], newCoord[1]))
+                    
+        return possMoves
 
         
                 
