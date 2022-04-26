@@ -147,7 +147,21 @@ class Board:
                     if temp == (not color):
                         self.board[newCoord2[0]][newCoord2[1]] = color
                     else:
-                        break    
+                        break
+    def getBoard(self):
+        return self.board
+
+    def rowPrint(self):
+        temp = []
+        for y in range(7,-1,-1):
+            temp2 = []
+            for x in range(8):
+                temp2.append(self.board[x][y])
+            temp.append(temp2)
+
+        for item in temp:
+            print(item)
+            
                              
 def test():
     test = Board()
