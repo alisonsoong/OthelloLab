@@ -23,12 +23,16 @@ class OthelloGUI:
         self.win.setCoords(-15,-17,150+2,150*3/4)
 
         self.pieces = []
-        for yy in range(8):
+        for y in range(8):
             row = []
-            y = 8-yy
             for x in range(8):
-                row.append(Piece(x,y,False))
+                row.append(Piece(y,x,False))
             self.pieces.append(row)
+
+        # for y in range(len(self.pieces)):
+        #     for x in range(len(self.pieces[0])):
+        #         print(x,"-", y , sep="", end = " ")
+        #     print()
 
         # Set up gui
         self.setUpButtons()
@@ -58,7 +62,7 @@ class OthelloGUI:
         self.isDone_ = False
         self.turnSkip_ = False
 
-        self.posMoves = []
+        self.posMoves = [-1]
 
         self.win.update()
 
@@ -137,8 +141,9 @@ class OthelloGUI:
     def updateBoard(self):
         # print("updated board")
         diff = self.curBoard-self.prevBoard
-        # print(diff)
+        # print("DIFF: " , diff)
         for change in diff:
+            # print("diff ", change, " change: ", self.curBoard.getValue(change[0], change[1]))
             x,y = change[0], change[1]
             newPiece = self.pieces[x][y]
             newVal = self.curBoard.getValue(x,y)
@@ -175,8 +180,17 @@ class OthelloGUI:
                 self.pt = self.win.getMouse()
             else:
                 time.sleep(1.5)
-        
+
+        # self.printPieces()
+
         self.win.update()
+
+    def printPieces(self):
+        # print("BLUB")
+        for y in range(8):
+            for x in range(8):
+                print(self.pieces[x][y].getColor(), end=" ")
+            print()
 
 
 
@@ -188,7 +202,7 @@ class OthelloGUI:
             self.isDone_ = True
             print("Thank you for playing Othello!")
             self.win.close()
-            return
+            quit()
 
         if self.replayButton.clicked(self.pt):
             self.gameStart_ = True
@@ -216,8 +230,10 @@ class OthelloGUI:
         # print(self.userColor_, self.curPlayerColor_)
         self.getUserMoves()
 
+        # print("current position: ", curPos)
+
         if self.userColor_ and not self.curPlayerColor_ or self.turnSkip_: # if user color is white, let AI move if cur player is black
-            print("first move lol")
+            # print("first move lol")
             self.makeAIMove()
             self.getUserMoves()
             if self.turnSkip_: 
@@ -228,11 +244,17 @@ class OthelloGUI:
             if self.curPlayerColor_ == True: self.msg = "White made a move!"
             else: self.msg = "Black made a move!"
 
+            # self.curBoard.printBoard()
+
             # switch color
             self.curPlayerColor_ = not self.curPlayerColor_
             self.msg += " It is now "
             if self.curPlayerColor_ == True: self.msg += "White's turn to play."
             else: self.msg += "Black's turn to play."
+
+            self.setPrompt(self.msg)
+            self.updateBoard()
+            self.prevBoard = Board(self.curBoard)
 
             # let AI move
             self.makeAIMove()
@@ -257,18 +279,21 @@ class OthelloGUI:
         #         print(self.curBoard.getValue(x,y), end=" ")
         #     print()
 
+        # self.curBoard.printBoard()
         self.setPrompt(self.msg)
         self.updateBoard()
 
     def getUserMoves(self):
-        if self.posMoves == []:
+        if self.posMoves == [-1]:
             # create new list of possible moves for user
-            # self.posMoves = self.curBoard.posMoves() # TODO implement this
+            print(self.curPlayerColor_)
+            self.posMoves = self.curBoard.simMoves(self.curPlayerColor_)
+            print("pos moves: ", self.posMoves)
             if self.posMoves == []:
                 # if it's STILL empty, then move onto the AI
                 print("MOVE ON")
                 self.turnSkip_ = True
-            print("moves generated")
+            # print("moves generated")
     
     def makeAIMove(self):
         if self.turnSkip_:
@@ -282,7 +307,11 @@ class OthelloGUI:
         self.setPrompt(self.msg)
         print("SIMULATE AI, MAKE AI MOVE FIRST")
         time.sleep(1.5)
-        self.posMoves = [] # reset
+        self.posMoves = self.curBoard.simMoves(self.curPlayerColor_)
+        if not(self.posMoves  == [-1]): 
+            print("AI MOVE: ", self.posMoves [0])
+            self.makeMove(self.posMoves [0])
+        self.posMoves = [-1] # reset
         print("AI DONE")
 
         # switch color
@@ -293,7 +322,13 @@ class OthelloGUI:
 
             
     def makeMove(self, pos):
-        if abs(pos[0]) > 7 or abs(pos[1]) > 7: return False
+        print(pos, self.posMoves)
+        if not (pos in self.posMoves): 
+            print("not a valid move")
+            return False
+        print("valid move")
+        self.curBoard.placePiece(pos, self.curPlayerColor_)
+
         return True
 
     def generateTestBoard(self):
@@ -318,6 +353,11 @@ class OthelloGUI:
                 self.pieces[i][j].undraw()
         self.prevBoard = Board() # empty
         self.curBoard.reset()
+
+        # print("RESET BOOARD AHHHHH")
+        # self.curBoard.printBoard()
+
+        self.posMoves = [-1]
 
         self.whiteScore = 2
         self.blackScore = 2
