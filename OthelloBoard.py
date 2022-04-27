@@ -98,7 +98,7 @@ class Board:
                 newCoord = [coord[0], coord[1]]
                 swap = False
                 sawStuff = False
-                while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
                     newCoord[1] += direction[1]
                     newCoord[0] += direction[0]
                     temp = self.board[newCoord[0]][newCoord[1]]
@@ -112,18 +112,23 @@ class Board:
                             # print("VALID2: ", newCoord)
                         else: validMove = False
                         break
-                    elif temp == color: 
-                        if sawStuff: 
-                            validMove = True
-                            # print("VALID3: ", newCoord)
-                        else: 
-                            validMove = False
-                        break
+                    # elif temp == color: 
+                    #     if sawStuff: 
+                    #         validMove = True
+                    #         # print("VALID3: ", newCoord)
+                    #     else: 
+                    #         validMove = False
+                    #     break
                     else:
                         validMove = False
                         break
+                    
+                    if not (0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7):
+                        if validMove: validMove = False
+                
 
-                if validMove: possMoves.append((newCoord[0], newCoord[1]))
+                if validMove and not (self.board[newCoord[0]][newCoord[1]] == None): 
+                    possMoves.append((newCoord[0], newCoord[1]))
 
             #     newCoord = [coord[0], coord[1]]
             #     validMove = False
@@ -164,7 +169,7 @@ class Board:
         for direction in directions:
             newCoord = [coord[0], coord[1]]
             swap = False
-            while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+            while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
                 newCoord[1] += direction[1]
                 newCoord[0] += direction[0]
                 temp = self.board[newCoord[0]][newCoord[1]]
@@ -178,7 +183,7 @@ class Board:
 
             if swap:
                 newCoord2 = [coord[0], coord[1]]
-                while 0 < newCoord2[0] < 7 and 0 < newCoord2[1] < 7:
+                while 0 <= newCoord2[0] + direction[0] <= 7 and 0 <= newCoord2[1] + direction[1] <= 7:
                     newCoord2[0] += direction[0]
                     newCoord2[1] += direction[1]
 
