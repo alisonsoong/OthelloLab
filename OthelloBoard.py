@@ -86,7 +86,7 @@ class Board:
             for direction in directions:
                 newCoord = [coord[0], coord[1]]
                 validMove = False
-                while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
                     newCoord[1] += direction[1]
                     newCoord[0] += direction[0]
                     temp = self.board[newCoord[0]][newCoord[1]]
@@ -98,7 +98,7 @@ class Board:
                     else:
                         break
 
-                if validMove:
+                if validMove and self.board[newCoord[0]][newCoord[1]] == None:
                     possMoves.append((newCoord[0], newCoord[1]))
         return possMoves
 
@@ -126,7 +126,7 @@ class Board:
             swap = False
             newCoord[1] += direction[1]
             newCoord[0] += direction[0]
-            while 0 <= newCoord[0] <= 7 and 0 <= newCoord[1] <= 7:
+            while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
                 temp = self.board[newCoord[0]][newCoord[1]]
                 if temp != None and temp == (not color):
                     swap = True
@@ -140,18 +140,16 @@ class Board:
 
             if swap:
                 newCoord2 = [coord[0], coord[1]]
-                newCoord2[0] += direction[0]
-                newCoord2[1] += direction[1]
-                while 0 < newCoord2[0] < 7 and 0 < newCoord2[1] < 7:
-
+                while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
+                    newCoord2[0] += direction[0]
+                    newCoord2[1] += direction[1]
+                    
                     temp = self.board[newCoord2[0]][newCoord2[1]]
                     
                     if temp == (not color):
                         self.board[newCoord2[0]][newCoord2[1]] = color
                     else:
                         break
-                    newCoord2[0] += direction[0]
-                    newCoord2[1] += direction[1]
                     
     def getBoard(self):
         return self.board
@@ -167,6 +165,11 @@ class Board:
         for item in temp:
             print(item)
             
+    def printBoard(self):
+        for y in range(8):
+            for x in range(8):
+                print(self.board[x][7-y], end=" ")
+            print()
                              
 def test():
     test = Board()

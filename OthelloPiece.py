@@ -8,18 +8,24 @@ class Piece:
         self.y = y
         self.color = color
 
-        self.circle = Circle(Point(x*10, y*10+10), 3.8)
+        self.circle = Circle(Point(x*10, y*10+20), 3.8)
 
         if self.color:
             self.circle.setFill('white')
         else:
             self.circle.setFill('black')
+
+        self.isDrawn = False
 
     def setColor(self):
         if self.color:
             self.circle.setFill('white')
         else:
             self.circle.setFill('black')
+
+    def getColor(self):
+        if (not self.isDrawn): return None
+        return self.color
         
     def toggle(self):
         #make toggle also draw
@@ -34,7 +40,9 @@ class Piece:
         self.setColor()
         
     def undraw(self):
+        self.isDrawn = False
         self.circle.undraw()
 
     def draw(self, win):
+        self.isDrawn = True
         self.circle.draw(win)
