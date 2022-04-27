@@ -269,7 +269,7 @@ class Move:
                 item.printInfo()
 
 
-test = Board()
+"""test = Board()
 test.setValue(3,3, False)
 test.setValue(3,4, True)
 test.setValue(4,3, True)
@@ -292,7 +292,7 @@ moveList = ai.simTurn(test)
 test.rowPrint()
 print()
 
-print(moveList)
+print(moveList)"""
             
 
     
