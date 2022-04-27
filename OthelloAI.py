@@ -146,46 +146,71 @@ class OthelloAI:
             
     def trySelf(self, move):
         move.getBoard().placePiece(move.getCoord(), self.color)
-        score = move.getBoard().calcScore()
-        if self.color == True:
-            move.updateScore(score[0])
-
-        else:
-            move.updateScore(score[1])
-
+        score = self.calcWeighted(move.getBoard())
+        move.updateScore(score)
+        
     def tryOpp(self, move):
         '''carbon copy of trySelf, just with swapped colors'''
         move.getBoard().placePiece(move.getCoord(), (not self.color))
-        score = move.getBoard().calcScore()
-        if self.color == True:
-            move.updateScore(score[0])
-
-        else:
-            move.updateScore(score[1])
+        score = self.calcWeighted(move.getBoard())
+        move.updateScore(score)
 
     def simTurn(self, board):
         output = self.simulate(board, self.possMoves(board))
         optimalMoves = []
         bestScore = -1 * 1000
         for move in output:
+            lowScore = 1000
             for move2 in move.getNext():
+                #for each two-move deep simulation, the lowest possible score is found
+                #finds lowest score within each branch
                 score = move2.getScore()
-                if score > bestScore:
-                    optimalMoves = []
-                    optimalMoves.append(move.getCoord())
-                    bestScore = score
-                    continue
+                if score < lowScore:
+                    lowScore = score
 
-                if score == bestScore:
-                    optimalMoves.append(move.getCoord())
-                    continue
+            if lowScore > bestScore:
+                #if the lowest score within each branch yields a higher score
+                optimalMoves = []
+                optimalMoves.append(move)#the entire move is appended to optimalMoves
+                bestScore = score
 
-        #not ideal, want to be looking at the move that yields the highest lowest score. don't trust the opponent to make a bad move
+                
+                
+            if lowScore == bestScore:
+                optimalMoves.append(move)
+
         
-        return output, optimalMoves
+        #optimalMoves is a list of all 'good' moves at (as of right now) one turn and one return turn of simulation
+
         
 
+        return optimalMoves[len(optimalMoves)//2].getCoord() #picks a single move from the list of optimalMoves
+        
 
+    def calcWeighted(self, boardObj):
+        #checks each of the 64 spaces in the board object and tallies the number of each piece
+        #sides and corners are worth more
+        #for use in AI
+        white = 0
+        black = 0
+        board = boardObj.getBoard()
+        for x in range(8):
+            for y in range(8):
+                if board[x][y] == True:
+                    if (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7):
+                        white += 5
+                    elif x == 0 or y == 0:
+                        white += 2
+                    else:
+                        white += 1
+                if board[x][y] == False:
+                    if (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7):
+                        black += 5
+                    elif x == 0 or y == 0:
+                        black += 2
+                    else:
+                        black += 1
+        return white, black
     
     
                             
@@ -206,7 +231,11 @@ class Move:
 
     def getScore(self):
 
-        return self.score
+        
+        return self.score[1] - self.score[0]
+
+        #score is stored as (white, black), getScore returns the difference
+        #in turns controlled. higher the number, the more "winning" the move
 
     def getMoveDepth(self):
 
@@ -241,12 +270,12 @@ class Move:
 
 
 test = Board()
-'''test.setValue(3,3, False)
+test.setValue(3,3, False)
 test.setValue(3,4, True)
 test.setValue(4,3, True)
-test.setValue(4,4, False)'''
+test.setValue(4,4, False)
 
-test.setValue(2,6, True)
+'''test.setValue(2,6, True)
 test.setValue(2,5, True)
 test.setValue(2,4, True)
 test.setValue(4,4, True)
@@ -254,20 +283,14 @@ test.setValue(4,4, True)
 test.setValue(3,2, False)
 test.setValue(3,3, False)
 test.setValue(3,4, False)
-test.setValue(4,3, False)
+test.setValue(4,3, False)'''
 
 ai = OthelloAI(False)
 
-temp, moveList = ai.simTurn(test)
+moveList = ai.simTurn(test)
 
 test.rowPrint()
 print()
-
-
-for item in temp:
-    
-    item.printInfo()
-    print()
 
 print(moveList)
             

@@ -124,9 +124,9 @@ class Board:
         for direction in directions:
             newCoord = [coord[0], coord[1]]
             swap = False
-            while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
-                newCoord[1] += direction[1]
-                newCoord[0] += direction[0]
+            newCoord[1] += direction[1]
+            newCoord[0] += direction[0]
+            while 0 <= newCoord[0] <= 7 and 0 <= newCoord[1] <= 7:
                 temp = self.board[newCoord[0]][newCoord[1]]
                 if temp != None and temp == (not color):
                     swap = True
@@ -135,12 +135,14 @@ class Board:
                     break
                 else:
                     break
+                newCoord[1] += direction[1]
+                newCoord[0] += direction[0]
 
             if swap:
                 newCoord2 = [coord[0], coord[1]]
+                newCoord2[0] += direction[0]
+                newCoord2[1] += direction[1]
                 while 0 < newCoord2[0] < 7 and 0 < newCoord2[1] < 7:
-                    newCoord2[0] += direction[0]
-                    newCoord2[1] += direction[1]
 
                     temp = self.board[newCoord2[0]][newCoord2[1]]
                     
@@ -148,6 +150,9 @@ class Board:
                         self.board[newCoord2[0]][newCoord2[1]] = color
                     else:
                         break
+                    newCoord2[0] += direction[0]
+                    newCoord2[1] += direction[1]
+                    
     def getBoard(self):
         return self.board
 
