@@ -44,6 +44,43 @@ class OthelloAI:
                     
         return possMoves
 
+    def opponentPossMoves(self, board):
+        '''carbon copy of possMoves, just for the opponent to the AI'''
+        possMoves = []
+        existingPieces = []
+        arr = board.getBoard()
+        
+        for x in range(8):
+            for y in range(8):
+                if arr[x][y] == (not self.color):
+                    existingPieces.append([x,y])
+
+        #checking 8 directions
+                    
+        directions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
+        for coord in existingPieces:
+            #for each piece, the board spaces in the 8 directions are checked iteratively
+            #if the move is legal, then it is added to possMoves
+            for direction in directions:
+                newCoord = [coord[0], coord[1]]
+                validMove = False
+                while 0 < newCoord[0] < 7 and 0 < newCoord[1] < 7:
+                    newCoord[1] += direction[1]
+                    newCoord[0] += direction[0]
+                    temp = arr[newCoord[0]][newCoord[1]]
+                    if temp != None and temp == self.color:
+                        validMove = True
+                    elif temp == (not self.color):
+                        validMove = False
+                        break
+                    else:
+                        break
+
+                if validMove:
+                    possMoves.append((newCoord[0], newCoord[1]))
+                    
+        return possMoves
+
     '''def trySelfMove(self, MoveObj):
         MoveObj.getBoard.placePiece(MoveObj.getCoord(), self.color)
         score = MoveObj.getBoard.calcScore()
@@ -81,12 +118,29 @@ class OthelloAI:
         #do i need to use moveDepth as an index for an expanding moveList to prevent aliasing?'''
 
     def simulate(self, board, possMoves):
+        
         moveList = []
         for coord in possMoves:
             moveList.append(Move(1, None, coord, Board(board), None))
 
         for item in moveList:
             self.trySelf(item)
+
+        #above is the ai color
+        #below is the opponent's response
+
+        for item in moveList:
+            tempList = self.opponentPossMoves(item.getBoard())
+            oppMoveList = []
+            for coord in tempList:
+                newMove = Move(item.getMoveDepth() + 1, None, coord, Board(item.getBoard()), None)
+                self.tryOpp(newMove)
+                oppMoveList.append(newMove)
+
+            item.setNext(oppMoveList)
+            
+
+        
 
         return moveList
             
@@ -99,10 +153,36 @@ class OthelloAI:
         else:
             move.updateScore(score[1])
 
+    def tryOpp(self, move):
+        '''carbon copy of trySelf, just with swapped colors'''
+        move.getBoard().placePiece(move.getCoord(), (not self.color))
+        score = move.getBoard().calcScore()
+        if self.color == True:
+            move.updateScore(score[0])
+
+        else:
+            move.updateScore(score[1])
+
     def simTurn(self, board):
         output = self.simulate(board, self.possMoves(board))
+        optimalMoves = []
+        bestScore = -1 * 1000
+        for move in output:
+            for move2 in move.getNext():
+                score = move2.getScore()
+                if score > bestScore:
+                    optimalMoves = []
+                    optimalMoves.append(move.getCoord())
+                    bestScore = score
+                    continue
 
-        return output
+                if score == bestScore:
+                    optimalMoves.append(move.getCoord())
+                    continue
+
+        #not ideal, want to be looking at the move that yields the highest lowest score. don't trust the opponent to make a bad move
+        
+        return output, optimalMoves
         
 
 
@@ -124,6 +204,10 @@ class Move:
 
         self.score = newScore
 
+    def getScore(self):
+
+        return self.score
+
     def getMoveDepth(self):
 
         return self.moveDepth
@@ -136,10 +220,24 @@ class Move:
 
         return self.currentBoard
 
+    def setNext(self, nextMoves):
+
+        self.nextMoves = nextMoves
+
+    def getNext(self):
+
+        return self.nextMoves
+
     def printInfo(self):
         #for debugging purposes
-        print("Move Info: ", self.moveDepth, self.score, self.moveCoordinate, 'CurrentBoardBelow', self.nextMoves)
-        print(self.currentBoard.rowPrint())
+        print("Move Info: ", self.moveDepth, self.score, self.moveCoordinate, 'CurrentBoardBelow')
+        #print(self.currentBoard.rowPrint())
+        print()
+        if self.nextMoves != None:
+            
+            for item in self.nextMoves:
+
+                item.printInfo()
 
 
 test = Board()
@@ -160,13 +258,18 @@ test.setValue(4,3, False)
 
 ai = OthelloAI(False)
 
-temp = ai.simTurn(test)
+temp, moveList = ai.simTurn(test)
+
+test.rowPrint()
+print()
 
 
 for item in temp:
     
     item.printInfo()
     print()
+
+print(moveList)
             
 
     
