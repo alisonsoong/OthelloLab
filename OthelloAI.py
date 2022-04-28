@@ -122,7 +122,7 @@ class OthelloAI:
         #given the board state of the executed move, a list of potential response moves are generated, simulated, and stored
         #as the nextMoves instance variable of the parent Move object
 
-        if move0.getMoveDepth() > 2: #pruning
+        '''if move0.getMoveDepth() > 2: #pruning
             #if the move tree is at sufficient depth, then the nextMoves list is
             #cut to only include the moves yielding the lowest scores i.e. the most realistic responses by the opponentya 
 
@@ -139,7 +139,7 @@ class OthelloAI:
                     if item.getScore() <= tempList[2]:
                         newList.append(item)
 
-                move0.setNext(newList)
+                move0.setNext(newList)'''
                 
                 
             
@@ -240,19 +240,23 @@ class OthelloAI:
             
 
         if lastBranch:
-            lowScore = 1000
+            scoreList = []
             for move in moveTree.getNext():
                 score = move.getScore()
-                if score < lowScore:
-                    lowScore = score
-            return lowScore
+                scoreList.append(score)
+
+            runningTotal = 0
+            for item in scoreList:
+                runningTotal += item
+            
+
+            return runningTotal//len(scoreList)
 
         else:
             lowestScore = 1000
             for nextMove in nextMoves:
                 tempScore = self.compileScore(nextMove)
 
-                
                 
                 if tempScore < lowestScore:
                     lowestScore = tempScore
