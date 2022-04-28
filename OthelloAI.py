@@ -117,74 +117,165 @@ class OthelloAI:
         #the strength/value of each move is tracked by your score - opponent score
         #do i need to use moveDepth as an index for an expanding moveList to prevent aliasing?'''
 
-    def simulate(self, board, possMoves):
-        
-        moveList = []
-        for coord in possMoves:
-            moveList.append(Move(1, None, coord, Board(board), None))
+    def simulate(self, move0):
 
-        for item in moveList:
-            self.trySelf(item)
+        self.trySelf(move0)
 
         #above is the ai color
         #below is the opponent's response
 
-        for item in moveList:
-            tempList = self.opponentPossMoves(item.getBoard())
-            oppMoveList = []
-            for coord in tempList:
-                newMove = Move(item.getMoveDepth() + 1, None, coord, Board(item.getBoard()), None)
-                self.tryOpp(newMove)
-                oppMoveList.append(newMove)
+        tempList = self.opponentPossMoves(move0.getBoard())
+        oppMoveList = []
+        for coord in tempList:
+            newMove = Move(move0.getMoveDepth() + 1, None, coord, Board(move0.getBoard()), None)
+            self.tryOpp(newMove)
+            oppMoveList.append(newMove)
 
-            item.setNext(oppMoveList)
+        move0.setNext(oppMoveList)
+
+        if move0.getMoveDepth() > 2: #pruning
+            #if the move tree is at sufficient depth, then the nextMoves list is
+            #cut to only include the moves yielding the lowest scores i.e. the most realistic responses by the opponent
+            tempList = []
+            nextMoves = move0.getNext()
+            for item in nextMoves:
+                tempList.append(item.getScore())
+
+            tempList.sort()
+            if len(tempList) > 3:
+                newList = []
+                for item in nextMoves:
+                    if item.getScore() <= tempList[2]:
+                        newList.append(item)
+
+                move0.setNext(newList)
+                
+                
             
 
-        
+        for move2 in move0.getNext():
+            #move 2 (response to move 1)
 
-        return moveList
+            if move2.getMoveDepth() >= 4: #controls the recursion depth/how deep the simulation goes
+                return
+
+            else:
+                nextPossMoves = self.possMoves(move2.getBoard())
+                tempList2 = []
+                for a in nextPossMoves:
+                    tempList2.append(Move(move2.getMoveDepth() + 1, None, a, Board(move2.getBoard()), None))
+                for b in tempList2:
+                    self.simulate(b)
+                    
+                    
+
+                if tempList2[0] == None:
+                    tempList2 = None
+                    
+
+                move2.setNext(tempList2)
+
+        
+                          
             
     def trySelf(self, move):
         move.getBoard().placePiece(move.getCoord(), self.color)
         score = self.calcWeighted(move.getBoard())
-        move.updateScore(score)
+        netScore = score[1]-score[0]
+        move.updateScore(netScore)
         
     def tryOpp(self, move):
         '''carbon copy of trySelf, just with swapped colors'''
         move.getBoard().placePiece(move.getCoord(), (not self.color))
         score = self.calcWeighted(move.getBoard())
-        move.updateScore(score)
+        netScore = score[1]-score[0]
+        move.updateScore(netScore)
 
     def simTurn(self, board):
-        output = self.simulate(board, self.possMoves(board))
+        masterMoves = []
+        possMoves = self.possMoves(board)
+        for coord in possMoves:
+            masterMoves.append(Move(1, None, coord, Board(board), None))
+        for item in masterMoves:
+            self.simulate(item)
+
+        #output is a list of move objects
+
+
         optimalMoves = []
         bestScore = -1 * 1000
-        for move in output:
-            lowScore = 1000
-            for move2 in move.getNext():
-                #for each two-move deep simulation, the lowest possible score is found
-                #finds lowest score within each branch
-                score = move2.getScore()
-                if score < lowScore:
-                    lowScore = score
 
-            if lowScore > bestScore:
-                #if the lowest score within each branch yields a higher score
+        for move in masterMoves:
+            score = self.compileScore(move)
+            if score > bestScore:
                 optimalMoves = []
-                optimalMoves.append(move)#the entire move is appended to optimalMoves
+                optimalMoves.append(move)
                 bestScore = score
-
-                
-                
-            if lowScore == bestScore:
+            elif score == bestScore:
                 optimalMoves.append(move)
 
+        #move selection works regardless of move depth 
         
-        #optimalMoves is a list of all 'good' moves at (as of right now) one turn and one return turn of simulation
+        #optimalMoves is a list of all 'good' moves at (as of right now) one turn and one return turn of simulation'''
 
         
 
-        return optimalMoves[len(optimalMoves)//2].getCoord() #picks a single move from the list of optimalMoves
+        '''return optimalMoves[0], optimalMoves[len(optimalMoves)//2].getCoord() #picks a single move from the list of optimalMoves'''
+
+        if len(optimalMoves) >= 1: return optimalMoves[len(optimalMoves)//2].getCoord()
+        else: return []
+
+
+    def compileScore(self, moveTree):
+        #parameter should be a single nested move object
+        #the 'optimal score' in the deepest tree is returned as the score of the entire move
+
+        nextMoves = moveTree.getNext()
+
+        lastBranch = False
+
+        for item in nextMoves:
+            if item.getNext() == None:
+                lastBranch = True
+                break
+            
+
+        if lastBranch:
+            lowScore = 1000
+            for move in moveTree.getNext():
+                score = move.getScore()
+                if score < lowScore:
+                    lowScore = score
+            return lowScore
+
+        else:
+            lowestScore = 1000
+            for nextMove in nextMoves:
+                tempScore = self.compileScore(nextMove) #what?
+
+                
+                
+                if tempScore < lowestScore:
+                    lowestScore = tempScore
+
+
+            moveTree.updateScore(lowestScore)
+
+            return moveTree.getScore()
+
+            #im a genius
+            
+
+                
+
+            
+
+            
+                    
+
+
+        
+        
         
 
     def calcWeighted(self, boardObj):
@@ -232,10 +323,12 @@ class Move:
     def getScore(self):
 
         
-        return self.score[1] - self.score[0]
+        return self.score
 
         #score is stored as (white, black), getScore returns the difference
         #in turns controlled. higher the number, the more "winning" the move
+        #not anymore, calcScore still returns a tuple and net score of tuple is calculated on the spot
+    
 
     def getMoveDepth(self):
 
@@ -269,13 +362,14 @@ class Move:
                 item.printInfo()
 
 
-"""test = Board()
-test.setValue(3,3, False)
-test.setValue(3,4, True)
-test.setValue(4,3, True)
-test.setValue(4,4, False)
+'''test = Board()
+#test.setValue(3,3, False)
+#test.setValue(3,4, True)
+#test.setValue(4,3, True)
+#test.setValue(4,4, False)
 
-'''test.setValue(2,6, True)
+
+test.setValue(2,6, True)
 test.setValue(2,5, True)
 test.setValue(2,4, True)
 test.setValue(4,4, True)
@@ -283,21 +377,19 @@ test.setValue(4,4, True)
 test.setValue(3,2, False)
 test.setValue(3,3, False)
 test.setValue(3,4, False)
-test.setValue(4,3, False)'''
+test.setValue(4,3, False)
+
 
 ai = OthelloAI(False)
 
-moveList = ai.simTurn(test)
+optimalMove = ai.simTurn(test)
 
 test.rowPrint()
 print()
 
-print(moveList)"""
-            
+print(optimalMove)'''
 
-    
-test
-        
+
                 
                 
                     
