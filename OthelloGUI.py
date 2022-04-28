@@ -12,7 +12,9 @@ from OthelloBoard import Board
 from graphics import *
 from Button import Button
 from OthelloPiece import Piece
+from OthelloAI import OthelloAI
 import time
+from random import randint
 
 class OthelloGUI:
     def __init__(self):
@@ -22,6 +24,7 @@ class OthelloGUI:
         self.win = GraphWin("Othello", 800, 600, autoflush = False)
         self.win.setBackground("white")
         self.win.setCoords(-15,-17,150+2,150*3/4)
+        self.AI = OthelloAI(True)
 
         self.pieces = []
         for y in range(8):
@@ -65,6 +68,10 @@ class OthelloGUI:
 
         self.posMoves = [-1]
 
+        self.pictures = ["memes/meme1.png", "memes/meme2.png", "memes/meme3.png", "memes/meme4.png", "memes/meme5.png"]
+        self.prevMeme = randint(0,4)
+        self.meme = Image(Point(115, 53),self.pictures[self.prevMeme])
+        self.memeDrawn = False
         self.win.update()
 
     def setUpPrompt(self):
@@ -106,15 +113,15 @@ class OthelloGUI:
         self.replayButton.draw(self.win)
 
     def setUpScoreboard(self):
-        self.scoreLabel = Text(Point(115, 75), "Score") 
+        self.scoreLabel = Text(Point(115,80), "Score") 
         self.scoreLabel.setSize(25)
         self.scoreLabel.draw(self.win)
-        Text(Point(101, 70), "White").draw(self.win)
-        Text(Point(129, 70), "Black").draw(self.win)
-        self.whiteScoreLabel = Text(Point(101, 75), "2") 
+        Text(Point(101, 75), "White").draw(self.win)
+        Text(Point(129, 75), "Black").draw(self.win)
+        self.whiteScoreLabel = Text(Point(101, 80), "2") 
         self.whiteScoreLabel.setSize(20)
         self.whiteScoreLabel.draw(self.win)
-        self.blackScoreLabel = Text(Point(129, 75), "2")
+        self.blackScoreLabel = Text(Point(129, 80), "2")
         self.blackScoreLabel.setSize(20) 
         self.blackScoreLabel.draw(self.win)
 
@@ -263,7 +270,16 @@ class OthelloGUI:
             if self.curPlayerColor_ == True: self.msg += "White's turn to play. "
             else: self.msg += "Black's turn to play. "
             self.msg += "Please press a square with a valid move."
-    
+
+        # change meme!
+        if (self.memeDrawn):
+            newMeme = randint(0,4)
+            while (newMeme != self.prevMeme): newMeme = randint(0,4)
+            self.prevMeme = newMeme
+            self.meme.undraw()
+            self.meme = Image(Point(115, 53),self.pictures[randint(0,4)])
+            self.meme.draw(self.win)
+
         # self.curBoard.printBoard()
         self.setPrompt(self.msg)
         self.updateBoard()
@@ -292,13 +308,23 @@ class OthelloGUI:
         self.setPrompt(self.msg)
         # print("SIMULATE AI, MAKE AI MOVE FIRST")
         time.sleep(1.5)
-        self.posMoves = self.curBoard.simMoves(self.curPlayerColor_)
-        if not(self.posMoves == []): 
-            aiMove = self.posMoves[0]
-            self.makeMove(aiMove)
+        # self.posMoves = self.curBoard.simMoves(self.curPlayerColor_)
+        # if not(self.posMoves == []): 
+        #     aiMove = self.AI.simTurn(Board(self.curBoard)) # self.posMoves[0]
+        #     print(aiMove)
+        #     self.makeMove(aiMove)
+        #     posInStr = str(chr(ord('A')+aiMove[0])) + str(aiMove[1]+1)
+        #     if self.curPlayerColor_: self.msg = "The AI made a move at " + posInStr + "!"
+        #     else: self.msg = "The AI made a move at " + posInStr + "!"
+        aiMove = self.AI.simTurn(Board(self.curBoard))
+        if aiMove: 
+            # print(aiMove)
+            self.curBoard.placePiece(aiMove, self.curPlayerColor_)
             posInStr = str(chr(ord('A')+aiMove[0])) + str(aiMove[1]+1)
             if self.curPlayerColor_: self.msg = "The AI made a move at " + posInStr + "!"
             else: self.msg = "The AI made a move at " + posInStr + "!"
+        else:
+            self.msg = "The AI could not make a move, and thus its turn has been skipped!"
         self.posMoves = [-1] # reset
         # print("AI DONE")
 
@@ -356,6 +382,8 @@ class OthelloGUI:
 
         self.msg = "Please choose what color you want to play as. Black moves first!"
 
+        self.memeDrawn = False
+
         self.startPrompt.draw(self.win)
         self.whiteButton.draw(self.win)
         self.blackButton.draw(self.win)
@@ -367,6 +395,7 @@ class OthelloGUI:
         self.startPrompt.undraw()
         self.whiteButton.undraw()
         self.blackButton.undraw()
+        self.memeDrawn = True
 
     def getUserColor(self, pt):
         if self.whiteButton.clicked(pt):
@@ -374,11 +403,13 @@ class OthelloGUI:
             self.gameStart_ = False
             self.userColor_ = True
             self.removeConfigForStart()
+            self.AI = OthelloAI(False)
             return
         elif self.blackButton.clicked(pt):
             self.prevGameStart_ = False
             self.gameStart_ = False
             self.userColor_ = False
+            self.AI = OthelloAI(True)
             self.removeConfigForStart()
             return
 
