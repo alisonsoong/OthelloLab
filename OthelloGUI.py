@@ -212,6 +212,7 @@ class OthelloGUI:
             print("Thank you for playing Othello!")
             self.win.close()
             quit()
+
         elif self.replayButton.clicked(self.pt):
             self.gameStart_ = True
             self.prevGameStart_ = False
@@ -233,64 +234,36 @@ class OthelloGUI:
         curY = self.pt.getY() - 15
         curPos = (int(curX/10), int(curY/10)) # current tile clicked
         curX, curY = curPos[0], curPos[1]
-        # print(curPos)
-        
+
         self.prevBoard = Board(self.curBoard) # make a copy of the previous board
 
-        # print(self.userColor_, self.curPlayerColor_)
         self.getUserMoves()
 
-        # print("current position: ", curPos)
-
         if self.userColor_ and not self.curPlayerColor_ or self.turnSkip_: # if user color is white, let AI move if cur player is black
-            # print("first move lol")
             self.makeAIMove()
             self.getUserMoves()
             if self.turnSkip_: 
                 self.curPlayerColor_ = not self.curPlayerColor_
-                # print("SKIP MOVE=-=-=-=-===-=-=-=-=-")
-        elif self.makeMove(curPos): # and self.curPlayerColor_ == self.userColor_:
-            # print("Made move!")
+        elif self.makeMove(curPos):
             posInStr = str(chr(ord('A')+curPos[0])) + str(curPos[1]+1)
             if self.curPlayerColor_: self.msg = "White made a move at " + posInStr + "!"
             else: self.msg = "Black made a move at " + posInStr + "!"
 
-            # self.curBoard.printBoard()
-
-            # time.sleep(1.5)
             # switch color
             self.curPlayerColor_ = not self.curPlayerColor_
-            # self.msg += " It is now "
-            # if self.curPlayerColor_ == True: self.msg += "White's turn to play."
-            # else: self.msg += "Black's turn to play."
-
-            # self.setPrompt(self.msg)
             self.updateBoard()
             self.prevBoard = Board(self.curBoard)
-            # time.sleep(1.5)
-            # let AI move
+
             self.makeAIMove()
             self.getUserMoves()
             if self.turnSkip_: 
                 self.curPlayerColor_ = not self.curPlayerColor_
-                # print("SKIP MOVE=-=-=-=-===-=-=-=-=-")
         else:
             self.msg = " It is now "
             if self.curPlayerColor_ == True: self.msg += "White's turn to play. "
             else: self.msg += "Black's turn to play. "
             self.msg += "Please press a square with a valid move."
-        
-        # testing updating board
-        # if curPos[0] == 15 and curPos[1] == 9: 
-        #     print("GENERATE NEW BOARD")
-        #     self.curBoard = self.generateTestBoard()
-
-        # print("AFTER")
-        # for y in range(8):
-        #     for x in range(8):
-        #         print(self.curBoard.getValue(x,y), end=" ")
-        #     print()
-
+    
         # self.curBoard.printBoard()
         self.setPrompt(self.msg)
         self.updateBoard()
@@ -408,11 +381,6 @@ class OthelloGUI:
             self.userColor_ = False
             self.removeConfigForStart()
             return
-
-        
-    
-
-
 
 
 if __name__ == '__main__': 
