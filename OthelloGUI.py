@@ -200,6 +200,11 @@ class OthelloGUI:
             print()
 
     def isGameEnd(self):
+        self.stalemate = False
+        if (not self.curBoard.simMoves(True)) and (not self.curBoard.simMoves(False)):
+            # no more moves for either player
+            self.stalemate = True
+            return True
         return self.whiteScore + self.blackScore == 64
 
     def update(self):
@@ -208,6 +213,8 @@ class OthelloGUI:
 
         if self.isGameEnd():
             self.msg = "The game has ended! "
+            if self.stalemate:
+                self.msg = " Stalemate! "
             if self.whiteScore > self.blackScore: self.msg += "White has won!"
             else: self.msg += "Black has won!"
             self.msg += " Press reset to play again, or quit to close the game."
@@ -379,6 +386,9 @@ class OthelloGUI:
 
     def configForStart(self):
         curPlayerColor_ = True
+
+        if self.memeDrawn:
+            self.meme.undraw()
 
         self.msg = "Please choose what color you want to play as. Black moves first!"
 
