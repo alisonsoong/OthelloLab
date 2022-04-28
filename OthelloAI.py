@@ -1,5 +1,9 @@
-#blub
-from OthelloGUI import *
+#Derik Liu
+#Othello AI
+#Contains the OthelloAI class as well as a helper Move class
+#AI object initialized via: ai = OthelloAI(True/False) - boolean assigned based on color
+#ai.simTurn(OthelloBoardObject) returns a single move coordinate
+
 class OthelloAI:
 
     def __init__(self, color):
@@ -8,8 +12,8 @@ class OthelloAI:
         self.color = color
 
     def possMoves(self, board):
-        '''board parameter should be passed as a Board object'''
-        '''returns a list of possible moves based on the color parameter.
+        '''board parameter should be passed as a Board object
+        returns a list of possible moves based on the color parameter.
         Colors passed as booleans, white is True, black is False.'''
         
         arr = board.getBoard()
@@ -93,45 +97,12 @@ class OthelloAI:
 
         return possMoves
 
-    '''def trySelfMove(self, MoveObj):
-        MoveObj.getBoard.placePiece(MoveObj.getCoord(), self.color)
-        score = MoveObj.getBoard.calcScore()
-        MoveObj.updateScore(score)
-        
-        
-        
 
-    def tryOpponentMove(self, board, newMove):
-        #the opponent is dumb, and will always pick the highest scoring move
-
-    def simulate(self, board, possMoves):
-
-        #moveList stores five item lists that are [moveDepth, score, moveCoordinate, currentBoard, nextMoves[]]
-        #another moveList object is appended to the end of the move
-        moveList = []
-        for coord in possMoves:
-            moveList.append(Move(1, None, coord, Board(board)), None)
-
-        for item in moveList:
-            self.trySelfMove(item)
-            
-            if item.getMoveDepth() = 1:
-                return moveList
-
-            else:
-                moveList[4] = self.possMoves(item[3])
-                self.simulate(moveList[4])
-                
-                
-            
-
-
-        #the strength/value of each move is tracked by your score - opponent score
-        #do i need to use moveDepth as an index for an expanding moveList to prevent aliasing?'''
 
     def simulate(self, move0):
 
         self.trySelf(move0)
+        #the input move is "executed" on a copied board
 
         #above is the ai color
         #below is the opponent's response
@@ -145,9 +116,14 @@ class OthelloAI:
 
         move0.setNext(oppMoveList)
 
+        #given the board state of the executed move, a list of potential response moves are generated, simulated, and stored
+        #as the nextMoves instance variable of the parent Move object
+
         if move0.getMoveDepth() > 2: #pruning
             #if the move tree is at sufficient depth, then the nextMoves list is
-            #cut to only include the moves yielding the lowest scores i.e. the most realistic responses by the opponent
+            #cut to only include the moves yielding the lowest scores i.e. the most realistic responses by the opponentya 
+
+            #pruning doesn't really affect runtime at reasonable depths, entire if statement can be left out
             tempList = []
             nextMoves = move0.getNext()
             for item in nextMoves:
@@ -166,23 +142,23 @@ class OthelloAI:
             
 
         for move2 in move0.getNext():
-            #move 2 (response to move 1)
+            #each move in the list of nextMoves assigned to move0 is passed back into simulate() in order to
+            #recursively simulate further outcomes
+            
 
             if move2.getMoveDepth() >= 4: #controls the recursion depth/how deep the simulation goes
+                                          #4 moves is fast, 6 moves takes ~10 seconds a move, 8 moves is too slow
                 return
 
             else:
+                #new moves are generated and simulated
+                #Move objects are mutable, and thus can be simulated before being appended to the parents Move object
                 nextPossMoves = self.possMoves(move2.getBoard())
                 tempList2 = []
                 for a in nextPossMoves:
                     tempList2.append(Move(move2.getMoveDepth() + 1, None, a, Board(move2.getBoard()), None))
                 for b in tempList2:
                     self.simulate(b)
-                    
-                    
-
-                # if tempList2[0] == None:
-                #     tempList2 = None
                     
 
                 move2.setNext(tempList2)
@@ -191,6 +167,8 @@ class OthelloAI:
                           
             
     def trySelf(self, move):
+        '''takes in a Move object containing a move coordinate and a copy of the current board state.
+        "resolves" the turn by executing the move and updating the board copy. score is calculated and updated as well'''
         move.getBoard().placePiece(move.getCoord(), self.color)
         score = self.calcWeighted(move.getBoard())
         netScore = score[1]-score[0]
@@ -204,11 +182,17 @@ class OthelloAI:
         move.updateScore(netScore)
 
     def simTurn(self, board):
+        '''takes in a board state and outputs a single move tuple'''
+        
         masterMoves = []
         possMoves = self.possMoves(board)
         for coord in possMoves:
+            #generates a Move object for each possible move given the board state
+            
             masterMoves.append(Move(1, None, coord, Board(board), None))
+            
         for item in masterMoves:
+            #takes each Move object in the list and simulates it to the desired depth
             self.simulate(item)
 
         #output is a list of move objects
@@ -219,6 +203,8 @@ class OthelloAI:
 
         for move in masterMoves:
             score = self.compileScore(move)
+            #assigns each of the top-level Move objects a score based on the possible scores
+            #of their simulated outcomes
             if score > bestScore:
                 optimalMoves = []
                 optimalMoves.append(move)
@@ -228,17 +214,15 @@ class OthelloAI:
 
         #move selection works regardless of move depth 
         
-        #optimalMoves is a list of all 'good' moves at (as of right now) one turn and one return turn of simulation'''
-
-        
-
-        '''return optimalMoves[0], optimalMoves[len(optimalMoves)//2].getCoord() #picks a single move from the list of optimalMoves'''
 
         if len(optimalMoves) >= 1: return optimalMoves[len(optimalMoves)//2].getCoord()
         else: return []
 
+        #returns a single move, or an empty list if there are no moves
+
 
     def compileScore(self, moveTree):
+        '''recursively runs down a Move object's "move tree" of simulated turns, and returns the highest lowest score'''
         #parameter should be a single nested move object
         #the 'optimal score' in the deepest tree is returned as the score of the entire move
 
@@ -263,7 +247,7 @@ class OthelloAI:
         else:
             lowestScore = 1000
             for nextMove in nextMoves:
-                tempScore = self.compileScore(nextMove) #what?
+                tempScore = self.compileScore(nextMove)
 
                 
                 
@@ -276,24 +260,11 @@ class OthelloAI:
             return moveTree.getScore()
 
             #im a genius
-            
-
-                
 
             
-
-            
-                    
-
-
-        
-        
-        
-
     def calcWeighted(self, boardObj):
-        #checks each of the 64 spaces in the board object and tallies the number of each piece
-        #sides and corners are worth more
-        #for use in AI
+        '''checks each of the 64 spaces in the board object and tallies the number of each piece
+        sides and corners are worth more. for use in AI'''
         white = 0
         black = 0
         board = boardObj.getBoard()
@@ -301,9 +272,9 @@ class OthelloAI:
             for y in range(8):
                 if board[x][y] == True:
                     if (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7):
-                        white += 5
+                        white += 5 #corners worth 5
                     elif x == 0 or y == 0:
-                        white += 2
+                        white += 2 #sides worth 2
                     else:
                         white += 1
                 if board[x][y] == False:
