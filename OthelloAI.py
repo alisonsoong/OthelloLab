@@ -362,11 +362,11 @@ class Move:
                 item.printInfo()
 
 
-test = Board()
-'''test.setValue(3,3, False)
-test.setValue(3,4, True)
-test.setValue(4,3, True)
-test.setValue(4,4, False)'''
+'''test = Board()
+#test.setValue(3,3, False)
+#test.setValue(3,4, True)
+#test.setValue(4,3, True)
+#test.setValue(4,4, False)
 
 
 test.setValue(2,6, True)
@@ -387,7 +387,7 @@ optimalMove = ai.simTurn(test)
 test.rowPrint()
 print()
 
-print(optimalMove)
+print(optimalMove)'''
 
 
                 
