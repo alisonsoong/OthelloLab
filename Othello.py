@@ -1,4 +1,4 @@
-# Alison lol
+# Alison
 from OthelloGUI import OthelloGUI
 
 def main():
