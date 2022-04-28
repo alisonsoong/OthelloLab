@@ -1,3 +1,7 @@
+#Derik Liu
+#OthelloPiece
+#Contains the Piece class and all associated methods
+
 from graphics import *
 class Piece:
 

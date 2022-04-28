@@ -1,3 +1,7 @@
+#Derik Liu
+#OthelloBoard
+#Contains Board class with all associated methods
+
 class Board:
 
     def __init__(self, copy = None):
@@ -24,7 +28,7 @@ class Board:
         return difference
 
     def reset(self):
-
+        '''wipes the whole board'''
         for x in range(8):
             for y in range(8):
                 self.board[x][y] = None
@@ -120,9 +124,11 @@ class Board:
         coord should be a tuple pair'''
 
         self.board[coord[0]][coord[1]] = color
-        # print("COORD PLACED: ", coord)
         directions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
         for direction in directions:
+            #for each direction, the squares in that direction are checked to verify if
+            #that direction's pieces should be changed
+            #if yes, they are swapped 
             newCoord = [coord[0], coord[1]]
             swap = False
             seenStuff = False
@@ -149,7 +155,6 @@ class Board:
                 else:
                     break
 
-            # print("direction: ", direction, " swap? ", swap)
             if swap:
                 newCoord2 = [coord[0], coord[1]]
                 while 0 <= newCoord2[0] + direction[0] <= 7 and 0 <= newCoord2[1] + direction[1] <= 7:
@@ -168,6 +173,7 @@ class Board:
         return self.board
 
     def rowPrint(self):
+        '''prints the board to shell in the correct orientation'''
         temp = []
         for y in range(7,-1,-1):
             temp2 = []

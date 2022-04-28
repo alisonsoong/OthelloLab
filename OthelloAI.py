@@ -4,6 +4,9 @@
 #AI object initialized via: ai = OthelloAI(True/False) - boolean assigned based on color
 #ai.simTurn(OthelloBoardObject) returns a single move coordinate
 
+from OthelloBoard import Board
+from OthelloPiece import Piece 
+
 class OthelloAI:
 
     def __init__(self, color):
@@ -77,7 +80,7 @@ class OthelloAI:
             #for each piece, the board spaces in the 8 directions are checked iteratively
             #if the move is legal, then it is added to possMoves
             
-            for direction in directions:
+            '''for direction in directions:
                 newCoord = [coord[0], coord[1]]
                 validMove = False
                 while 0 <= newCoord[0] + direction[0] <= 7 and 0 <= newCoord[1] + direction[1] <= 7:
@@ -93,7 +96,7 @@ class OthelloAI:
                         break
 
                 if validMove and arr[newCoord[0]][newCoord[1]] == None:
-                    possMoves.append((newCoord[0], newCoord[1]))
+                    possMoves.append((newCoord[0], newCoord[1]))'''
 
         return possMoves
 
@@ -272,14 +275,14 @@ class OthelloAI:
             for y in range(8):
                 if board[x][y] == True:
                     if (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7):
-                        white += 5 #corners worth 5
+                        white += 10 #corners worth 8
                     elif x == 0 or y == 0:
                         white += 2 #sides worth 2
                     else:
                         white += 1
                 if board[x][y] == False:
                     if (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7):
-                        black += 5
+                        black += 10
                     elif x == 0 or y == 0:
                         black += 2
                     else:

@@ -12,7 +12,7 @@ from OthelloBoard import Board
 from graphics import *
 from Button import Button
 from OthelloPiece import Piece
-from OthelloAI import OthelloAI
+from OthelloAI import *
 import time
 from random import randint
 
