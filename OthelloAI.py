@@ -222,7 +222,8 @@ class OthelloAI:
 
         '''return optimalMoves[0], optimalMoves[len(optimalMoves)//2].getCoord() #picks a single move from the list of optimalMoves'''
 
-        return optimalMoves, optimalMoves[len(optimalMoves)//2].getCoord()
+        if len(optimalMoves) >= 1: return optimalMoves[len(optimalMoves)//2].getCoord()
+        else: return []
 
 
     def compileScore(self, moveTree):
@@ -378,17 +379,17 @@ test.setValue(3,3, False)
 test.setValue(3,4, False)
 test.setValue(4,3, False)
 
+
 ai = OthelloAI(False)
 
-moveList, optimalMove = ai.simTurn(test)
+optimalMove = ai.simTurn(test)
 
 test.rowPrint()
 print()
 
 print(optimalMove)
 
-for item in moveList:
-    print(item.getCoord())
+
                 
                 
                     
